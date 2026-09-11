@@ -7,12 +7,6 @@ import EmojiPicker from "emoji-picker-react";
 import {
   Image,
   Smile,
-  Type,
-  Bold,
-  Italic,
-  Underline,
-  Link2,
-  Paperclip,
 } from "lucide-react";
 
 const LIMITS = {
@@ -203,8 +197,6 @@ const App = () => {
             </div>
           )}
         </div>
-
-
 
         {/* Validation */}
         <div className="flex justify-between mt-6">

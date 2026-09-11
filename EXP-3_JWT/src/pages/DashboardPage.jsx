@@ -8,6 +8,8 @@ import {
   setPlatform,
   setImage,
   addPost,
+  deletePost,
+  updatePost,
 } from "../features/posts/postSlice";
 
 import {
@@ -58,6 +60,10 @@ const DashboardPage = () => {
   const [open, setOpen] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  
+  // Edit state
+  const [editingId, setEditingId] = useState(null);
+  const [editContent, setEditContent] = useState('');
 
   const fileInputRef = useRef(null);
 
@@ -338,26 +344,76 @@ const DashboardPage = () => {
             Published Posts
           </h2>
 
-          {posts.filter(p => payload && p.userId === payload.userId).length === 0 ? (
+          {posts.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-              You haven't published any posts yet.
+              No posts have been published yet.
             </p>
           ) : (
              <div className="space-y-4">
-               {posts
-                 .filter(p => p.userId === payload.userId)
-                 .map((item) => (
+               {posts.map((item) => (
                  <div
                    key={item.id}
                    className="bg-gray-50 dark:bg-[#252239] border border-gray-200 dark:border-white/10 rounded-2xl p-5 transition-colors"
                  >
-                   <p className="text-indigo-600 dark:text-indigo-400 font-semibold mb-2">
-                     {item.platform}
-                   </p>
+                   <div className="flex justify-between items-start mb-2">
+                     <p className="text-indigo-600 dark:text-indigo-400 font-semibold">
+                       {item.platform}
+                     </p>
+                     {userRole === 'admin' && (
+                       <div className="flex gap-2">
+                         {editingId === item.id ? (
+                           <>
+                             <button
+                               onClick={() => {
+                                 dispatch(updatePost({ id: item.id, content: editContent }));
+                                 setEditingId(null);
+                               }}
+                               className="text-green-600 hover:text-green-800 bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 px-3 py-1 rounded-lg text-sm font-medium transition-all"
+                             >
+                               Save
+                             </button>
+                             <button
+                               onClick={() => setEditingId(null)}
+                               className="text-gray-600 hover:text-gray-800 bg-gray-100 dark:bg-gray-500/10 hover:bg-gray-200 dark:hover:bg-gray-500/20 px-3 py-1 rounded-lg text-sm font-medium transition-all"
+                             >
+                               Cancel
+                             </button>
+                           </>
+                         ) : (
+                           <>
+                             <button
+                               onClick={() => {
+                                 setEditingId(item.id);
+                                 setEditContent(item.content);
+                               }}
+                               className="text-blue-500 hover:text-blue-700 bg-blue-100 dark:bg-blue-500/10 hover:bg-blue-200 dark:hover:bg-blue-500/20 px-3 py-1 rounded-lg text-sm font-medium transition-all"
+                             >
+                               Edit
+                             </button>
+                             <button
+                               onClick={() => dispatch(deletePost(item.id))}
+                               className="text-red-500 hover:text-red-700 bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 px-3 py-1 rounded-lg text-sm font-medium transition-all"
+                             >
+                               Delete
+                             </button>
+                           </>
+                         )}
+                       </div>
+                     )}
+                   </div>
 
-                   <p className="text-gray-800 dark:text-white whitespace-pre-wrap text-sm leading-relaxed">
-                     {item.content}
-                   </p>
+                   {editingId === item.id ? (
+                     <textarea
+                       value={editContent}
+                       onChange={(e) => setEditContent(e.target.value)}
+                       className="w-full mt-2 bg-white dark:bg-[#1C1A2D] border border-gray-300 dark:border-white/10 rounded-xl p-3 text-gray-900 dark:text-white outline-none focus:border-indigo-500 transition-colors resize-none"
+                       rows={3}
+                     />
+                   ) : (
+                     <p className="text-gray-800 dark:text-white whitespace-pre-wrap text-sm leading-relaxed mt-2">
+                       {item.content}
+                     </p>
+                   )}
 
                    {item.image && (
                      <img

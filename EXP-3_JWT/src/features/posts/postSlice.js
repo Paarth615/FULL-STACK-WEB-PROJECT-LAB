@@ -37,6 +37,13 @@ const postSlice = createSlice({
         (post) => post.id !== action.payload
       );
     },
+
+    updatePost: (state, action) => {
+      const index = state.posts.findIndex((p) => p.id === action.payload.id);
+      if (index !== -1) {
+        state.posts[index].content = action.payload.content;
+      }
+    },
   },
 });
 
@@ -46,6 +53,7 @@ export const {
   setImage,
   addPost,
   deletePost,
+  updatePost,
 } = postSlice.actions;
 
 export default postSlice.reducer;
